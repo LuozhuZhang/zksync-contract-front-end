@@ -10,15 +10,8 @@ yarn install
 yarn serve
 ```
 
-### Compiles and minifies for production
-```
-yarn build
-```
+# 介绍
 
-### Lints and fixes files
-```
-yarn lint
-```
+使用vue实现了一个简单的合约调用页面，连接钱包后可以收到合约中存储的消息
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+![image]()

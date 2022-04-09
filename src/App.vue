@@ -43,10 +43,13 @@
 </template>
 
 <script>
+import { Contract, Web3Provider, Provider } from "zksync-web3";
+import { ethers } from "ethers";
+
 // eslint-disable-next-line
-const GREETER_CONTRACT_ADDRESS = ''; // TODO: Add smart contract address
+const GREETER_CONTRACT_ADDRESS = '0x99b6022120302cF091d3eDf7Ed7a1b7Cb3CB8f61'; // contract Address
 // eslint-disable-next-line
-const GREETER_CONTRACT_ABI = []; // TODO: Add link to the ABI  
+const GREETER_CONTRACT_ABI = require('./abi.json'); // contract ABI  
 
 const allowedTokens = require("./tokens.json");
 
@@ -77,36 +80,58 @@ export default {
     }
   },
   methods: {
+    // * 连接钱包的provider，Web3Provider和Provider用于和zkSync network交互，Contract用于和Greeter.sol合约交互
+    // * initialize provider and signer based on `window.ethereum`
     initializeProviderAndSigner() {
-      // TODO: initialize provider and signer based on `window.ethereum`
+      // * provider用于发送RPC请求 与节点通信（这里使用的zksync节点的rpc url），signer是电子签名 用于签发交易（这里使用metamask的signer）
+      // * window.ethereum是一个全局可用的以太坊API，兼容大部分浏览器
+      // * https://www.preethikasireddy.com/post/the-architecture-of-a-web-3-0-application
+      this.provider = new Provider('https://zksync2-testnet.zksync.dev');
+      this.signer = (new Web3Provider(window.ethereum)).getSigner();
+
+      // * 连接Greeter.sol合约（通过address和ABI）
+      this.contract = new Contract(
+        GREETER_CONTRACT_ADDRESS,
+        GREETER_CONTRACT_ABI,
+        this.signer
+      );
     },
     async getGreeting() {
-      // TODO: return the current greeting
-      return "";
+      // * 调用合约，返回消息内容
+      return await this.contract.greet();
     },
     async getFee() {
-      // TOOD: return formatted fee
-      return "";
+      // * 预估一笔交易需要的gas费
+      const feeInGas = await this.contract.estimateGas.setGreeting(this.newGreeting);
+      const gasPriceInUnits = await this.provider.getGasPrice();
+      return ethers.utils.formatUnits(feeInGas.mul(gasPriceInUnits), this.selectedToken.decimals);
     },
     async getBalance() {
-      // Return formatted balance
-      return "";
+      const balanceInUnits = await this.signer.getBalance(this.selectedToken.address);
+      // * 转换格式：wei -> eth，USD的格式还有点问题
+      return ethers.utils.formatUnits(balanceInUnits, this.selectedToken.decimals);
     },
     async changeGreeting() {
       this.txStatus = 1;
       try {
-        // TODO: Submit the transaction
+        const txHandle = await this.contract.setGreeting(this.newGreeting, {
+          customData: {
+            // * 选择支付tx fee的token
+            feeToken: this.selectedToken.address
+          }
+        });
         this.txStatus = 2;
 
-        // TODO: Wait for transaction compilation
+        // * 等待交易完成
+        await txHandle.wait();
         this.txStatus = 3;
 
-        // Update greeting
+        // * 更新greeting
         this.greeting = await this.getGreeting();
 
         this.retreivingFee = true;
         this.retreivingBalance = true;
-        // Update balance and fee
+        // * 更新 balance 和 fee
         this.currentBalance = await this.getBalance();
         this.currentFee = await this.getFee();
       } catch (e) {
@@ -120,6 +145,7 @@ export default {
 
     updateFee() {
       this.retreivingFee = true;
+      // * 调用getFee，计算交易费用
       this.getFee().then((fee) => {
         this.currentFee = fee;
       })
@@ -130,6 +156,7 @@ export default {
     },
     updateBalance() {
       this.retreivngBalance = true;
+      // * 调用getBalance，计算余额
       this.getBalance().then((balance) => {
         this.currentBalance = balance;
       })
@@ -138,29 +165,35 @@ export default {
         this.retreivngBalance = true;
       });
     },
+    // * 3.更改token时，自动计算balance和交易fee
     changeToken() {
       this.selectedToken = this.tokens.filter(t => t.address == this.selectedTokenAddress)[0];
-
       this.updateFee();
       this.updateBalance();
     },
+    // * 2.加载主页面
     loadMainScreen() {
       this.initializeProviderAndSigner();
+      alert("debug：Successful connection");
 
       if(!this.provider || !this.signer) {
         alert("Follow the tutorial to learn how to connect to Metamask!");
         return;
       }
 
+      // * 调用合约，获取消息；将mainloading的状态改为false，加载出主页面
+      // * v-if条件渲染很方便，react的稍微复杂一些：https://zh-hans.reactjs.org/docs/conditional-rendering.html
       this.getGreeting().then((greeting) => {
         this.greeting = greeting;
         this.mainLoading = false;
       });
     },  
     connectMetamask() {
+      // * 1.发送eth_requestAccounts rpc请求，连接metamask钱包
       window.ethereum.request({ method: 'eth_requestAccounts' })
         .then(() => {
           if (+window.ethereum.networkVersion == 280) {
+            // * 连接成功后加载主页面
             this.loadMainScreen();
           } else {
             alert("Please switch network to zkSync!");
