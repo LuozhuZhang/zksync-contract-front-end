@@ -2,7 +2,7 @@
   <a href="https://liamcobb.com/">
     <img alt="starknet logo" src="https://ethereum.org/static/28214bb68eb5445dcb063a72535bc90c/9019e/hero.webp" >
   </a>
-  <h1 align="center">zksync-demo front-end</h1>
+  <h1 align="center">zksync-contract front-end</h1>
   <p align="center">
     <a href="https://github.com/hedgezhu/zksync-demo-front-end/graphs/contributors">
       <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/hedgezhu/zksync-demo-front-end">
