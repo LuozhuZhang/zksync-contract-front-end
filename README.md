@@ -16,7 +16,7 @@
   </p>
 </div>
 
-# zksync-demo-front-end
+# zksync-contract-front-end
 
 安装依赖文件
 ```
@@ -50,7 +50,7 @@ yarn serve
 
 ---
 
-# zksync-demo-front-end
+# zksync-contract-front-end
 
 Install dependencies
 ```
