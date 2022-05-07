@@ -4,8 +4,8 @@
   </a>
   <h1 align="center">zksync-contract front-end</h1>
   <p align="center">
-    <a href="https://github.com/hedgezhu/zksync-demo-front-end/graphs/contributors">
-      <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/hedgezhu/zksync-demo-front-end">
+    <a href="https://github.com/LuozhuZhang/daodao2007/zksync-demo-front-end/graphs/contributors">
+      <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/LuozhuZhang/daodao2007/zksync-demo-front-end">
     </a>
     <a href="https://www.typescriptlang.org/">
       <img alt="TS" src="https://img.shields.io/badge/--3178C6?logo=typescript&logoColor=ffffff">
