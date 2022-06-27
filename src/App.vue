@@ -1,5 +1,4 @@
 <template>
-  <meta name="google-site-verification" content="3NHhqgFIEb5TTfIk9DmCiVkRUbi3qkPIFtjLtrdJ0x0" />
   <div id="app" v-if="!mainLoading">
     <h1> Greeter says: {{greeting}} 👋</h1>
     <div>
